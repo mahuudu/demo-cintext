@@ -24,7 +24,7 @@
 <body>
   <div id="root"></div>
   <script type="text/babel" data-presets="react" data-type="module">
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ShoppingCart, Check, Phone, Wifi, Shield, Zap, ArrowRight, Plus, Minus, X, Menu, ChevronRight, Star, CreditCard, Lock, Truck, Search, MapPin, Heart, ChevronDown, Globe, Smartphone, Tag, Info, ArrowLeft, RefreshCw, Mail, MessageCircle, ChevronUp, Languages, Calculator, DollarSign, Sparkles, BadgeCheck, Send, Calendar, Award, Users, Home, User, MoreHorizontal } from 'lucide-react';
 
@@ -1150,7 +1150,7 @@ function PhoneSvg({ brand, primaryColor = '#1a1a1a', size = 'md' }) {
   const isApple = brand === 'Apple', isPixel = brand === 'Google', isSamsung = brand === 'Samsung';
   const uid = `${primaryColor}-${size}`.replace(/[^a-zA-Z0-9]/g, '');
   return (
-    <svg viewBox="0 0 160 320" width={w} height={w * 2} xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
+    <svg viewBox="0 0 160 320" width={w} height={Math.round(w * 1.4)} xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
       <defs>
         <linearGradient id={`screen-${uid}`} x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#2a2a30" /><stop offset="100%" stopColor="#0a0a14" /></linearGradient>
         <linearGradient id={`body-${uid}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={primaryColor} stopOpacity="0.95" /><stop offset="50%" stopColor={primaryColor} /><stop offset="100%" stopColor={primaryColor} stopOpacity="0.92" /></linearGradient>
@@ -1274,6 +1274,9 @@ function CintexWireless() {
   const [points] = useState(2480);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
+  const ddTimerRef = useRef(null);
+  const openDD = (name) => { clearTimeout(ddTimerRef.current); setOpenDropdown(name); };
+  const closeDD = () => { ddTimerRef.current = setTimeout(() => setOpenDropdown(null), 120); };
 
   useEffect(() => { if (toast) { const x = setTimeout(() => setToast(null), 3000); return () => clearTimeout(x); } }, [toast]);
 
@@ -1462,13 +1465,13 @@ function CintexWireless() {
             </button>
 
             {/* Services dropdown */}
-            <div className="cx-nav-dd-wrap" onMouseEnter={() => setOpenDropdown('services')} onMouseLeave={() => setOpenDropdown(null)}>
+            <div className="cx-nav-dd-wrap" onMouseEnter={() => openDD('services')} onMouseLeave={closeDD}>
               <button className={`cx-nav-link cx-nav-dd-trigger ${['coverage','tradein','addons','byod'].includes(route) ? 'active' : ''}`}>
                 {lang === 'en' ? 'Services' : 'Servicios'}
                 <ChevronDown size={12} className={`cx-nav-dd-chevron ${openDropdown === 'services' ? 'open' : ''}`} />
               </button>
               {openDropdown === 'services' && (
-                <div className="cx-nav-dd">
+                <div className="cx-nav-dd" onMouseEnter={() => openDD('services')} onMouseLeave={closeDD}>
                   <button className="cx-nav-dd-item" onClick={() => { go('coverage'); setOpenDropdown(null); }}><MapPin size={14} />{t.nav.coverage}</button>
                   <button className="cx-nav-dd-item" onClick={() => { go('addons'); setOpenDropdown(null); }}><Sparkles size={14} />{t.nav.addons}</button>
                   <button className="cx-nav-dd-item" onClick={() => { go('tradein'); setOpenDropdown(null); }}><RefreshCw size={14} />{t.nav.tradeIn}</button>
@@ -1478,13 +1481,13 @@ function CintexWireless() {
             </div>
 
             {/* Account dropdown */}
-            <div className="cx-nav-dd-wrap" onMouseEnter={() => setOpenDropdown('account')} onMouseLeave={() => setOpenDropdown(null)}>
+            <div className="cx-nav-dd-wrap" onMouseEnter={() => openDD('account')} onMouseLeave={closeDD}>
               <button className={`cx-nav-link cx-nav-dd-trigger ${['dashboard','perks','remittance','compare'].includes(route) ? 'active' : ''}`}>
                 <User size={13} style={{marginRight: 4, verticalAlign: 'middle'}} />{t.nav.dashboard}
                 <ChevronDown size={12} className={`cx-nav-dd-chevron ${openDropdown === 'account' ? 'open' : ''}`} />
               </button>
               {openDropdown === 'account' && (
-                <div className="cx-nav-dd">
+                <div className="cx-nav-dd" onMouseEnter={() => openDD('account')} onMouseLeave={closeDD}>
                   <button className="cx-nav-dd-item" onClick={() => { go('dashboard'); setOpenDropdown(null); }}><Users size={14} />{t.nav.dashboard}</button>
                   <button className="cx-nav-dd-item" onClick={() => { go('perks'); setOpenDropdown(null); }}><Award size={14} />{t.nav.perks}</button>
                   <button className="cx-nav-dd-item" onClick={() => { go('remittance'); setOpenDropdown(null); }}><Heart size={14} />{lang === 'en' ? 'Pay for family' : 'Pagar familia'}</button>
@@ -1703,7 +1706,7 @@ function HomePage({ t, lang, go, addToCart, savings, setSavings, calculateSaving
             <div>
               <div className="cx-section-eyebrow"><Calculator size={11} style={{verticalAlign: 'middle', marginRight: 4}} /> {t.hero.calcTitle}</div>
               <h2 style={{fontFamily: 'Fraunces, serif', fontSize: 36, fontWeight: 500, lineHeight: 1.1, margin: '12px 0 16px'}}>
-                {lang === 'en' ? <>How much could <em style={{fontStyle: 'italic', color: 'var(--accent)'}}>your familia</em> save?</> : <>¿Cuánto podría ahorrar <em style={{fontStyle: 'italic', color: 'var(--accent)'}}>tu familia</em>?</>}
+                {lang === 'en' ? <>How much could <em style={{fontStyle: 'italic', color: 'var(--accent-text)'}}>your familia</em> save?</> : <>¿Cuánto podría ahorrar <em style={{fontStyle: 'italic', color: 'var(--accent-text)'}}>tu familia</em>?</>}
               </h2>
               <p style={{fontSize: 15, color: 'var(--ink-soft)', maxWidth: 420, marginBottom: 24}}>
                 {lang === 'en' ? 'Tell us your current bill, we\'ll show you exactly how much Cintex saves you per year — no email needed.' : 'Dinos cuánto pagas ahora, te mostramos exactamente cuánto ahorras al año con Cintex — sin correo.'}
@@ -1773,7 +1776,7 @@ function HomePage({ t, lang, go, addToCart, savings, setSavings, calculateSaving
         <div className="cx-container">
           <div className="cx-byod">
             <div style={{position: 'relative', zIndex: 1}}>
-              <div className="cx-section-eyebrow" style={{color: 'var(--accent)'}}>{lang === 'en' ? 'Bring your own phone' : 'Trae tu propio teléfono'}</div>
+              <div className="cx-section-eyebrow" style={{color: 'var(--accent-text)'}}>{lang === 'en' ? 'Bring your own phone' : 'Trae tu propio teléfono'}</div>
               <h2 style={{color: 'var(--bg)'}}>{lang === 'en' ? <>Already have a phone?<br/><em style={{color: 'var(--accent)'}}>Keep it.</em></> : <>¿Ya tienes un teléfono?<br/><em style={{color: 'var(--accent)'}}>Quédatelo.</em></>}</h2>
               <p>{lang === 'en' ? 'Most unlocked phones work on Cintex. Check compatibility and coverage in 30 seconds.' : 'La mayoría de teléfonos desbloqueados funcionan. Verifica compatibilidad y cobertura en 30 segundos.'}</p>
               <button className="cx-btn cx-btn-accent cx-btn-lg" onClick={() => go('byod')}>{lang === 'en' ? 'Check compatibility' : 'Verificar compatibilidad'} <ArrowRight size={16} /></button>
@@ -1795,7 +1798,7 @@ function HomePage({ t, lang, go, addToCart, savings, setSavings, calculateSaving
             <h2>{lang === 'en' ? <>New phones,<br/><em>old-school prices.</em></> : <>Teléfonos nuevos,<br/><em>precios honestos.</em></>}</h2>
           </div>
           <div className="cx-phones-grid">
-            {PHONES.slice(0, 3).map((p) => <PhoneCard key={p.id} t={t} lang={lang} phone={p} go={go} openBundleModal={openBundleModal} />)}
+            {PHONES.slice(0, 4).map((p) => <PhoneCard key={p.id} t={t} lang={lang} phone={p} go={go} openBundleModal={openBundleModal} />)}
           </div>
           <div style={{textAlign: 'center', marginTop: 32}}>
             <button className="cx-btn cx-btn-ghost cx-btn-lg" onClick={() => go('phones')}>{lang === 'en' ? 'Shop all phones' : 'Ver todos'} <ArrowRight size={16} /></button>
@@ -2762,7 +2765,7 @@ function CheckoutPage({ t, lang, cart, subtotal, discount, tax, total, go, setOr
                     </button>
                   </div>
                   <div style={{fontSize: 11, color: 'var(--muted)', marginTop: 12, textAlign: 'center'}}>
-                    {t.checkout.agreeTerms} <a href="#" style={{color: 'var(--accent)'}}>{t.checkout.terms}</a>.
+                    {t.checkout.agreeTerms} <a href="#" style={{color: 'var(--accent-text)'}}>{t.checkout.terms}</a>.
                   </div>
                 </>
               ) : <div style={{fontSize: 13, color: 'var(--muted)'}}>...</div>}
@@ -3125,7 +3128,7 @@ function PerksPage({ t, lang, go, referralCopied, setReferralCopied, setToast })
             <div>
               <div className="cx-section-eyebrow">{t.perksPage.sharePerks}</div>
               <h2 style={{fontFamily: 'Fraunces, serif', fontSize: 32, fontWeight: 500, margin: '12px 0 12px'}}>
-                {lang === 'en' ? <>Get <em style={{color: 'var(--accent)', fontStyle: 'italic'}}>$20</em>. Give <em style={{color: 'var(--accent)', fontStyle: 'italic'}}>$20</em>.</> : <>Recibe <em style={{color: 'var(--accent)', fontStyle: 'italic'}}>$20</em>. Da <em style={{color: 'var(--accent)', fontStyle: 'italic'}}>$20</em>.</>}
+                {lang === 'en' ? <>Get <em style={{color: 'var(--accent-text)', fontStyle: 'italic'}}>$20</em>. Give <em style={{color: 'var(--accent-text)', fontStyle: 'italic'}}>$20</em>.</> : <>Recibe <em style={{color: 'var(--accent-text)', fontStyle: 'italic'}}>$20</em>. Da <em style={{color: 'var(--accent-text)', fontStyle: 'italic'}}>$20</em>.</>}
               </h2>
               <p style={{color: 'var(--ink-soft)', maxWidth: 460, marginBottom: 24}}>{t.perksPage.shareNote}</p>
             </div>
@@ -3642,14 +3645,16 @@ function CintexStyles() {
   return (
     <style>{`
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@400;500;600;700&display=swap');
-
+body{
+      margin:0px;
+}
 .cintex-app {
   --bg: #fff8f5; --bg-warm: #fff0e8; --paper: #ffffff;
-  --ink: #1f0d05; --ink-soft: #4a2810; --muted: #9a6a50;
+  --ink: #1f0d05; --ink-soft: #4a2810; --muted: #7a5040;
   --line: #fad5c0; --line-soft: #fde8da;
-  --accent: #ff6a2f; --accent-deep: #e8521a; --accent-soft: #ffd0b8; --accent-tint: #fff0e8;
-  --green: #3a8a3a; --green-soft: #e0f5e0;
-  --red: #d93010; --red-soft: #ffe8e0;
+  --accent: #ff6a2f; --accent-deep: #c44010; --accent-text: #b83a0a; --accent-soft: #ffd0b8; --accent-tint: #fff0e8;
+  --green: #2a6a2a; --green-soft: #e0f5e0;
+  --red: #b82808; --red-soft: #ffe8e0;
   font-family: 'Inter', system-ui, sans-serif;
   background: var(--bg); color: var(--ink); min-height: 100vh; line-height: 1.5;
 }
@@ -3701,7 +3706,8 @@ function CintexStyles() {
 .cx-nav-dd-trigger { display: inline-flex; align-items: center; gap: 4px; }
 .cx-nav-dd-chevron { transition: transform 0.2s; flex-shrink: 0; }
 .cx-nav-dd-chevron.open { transform: rotate(180deg); }
-.cx-nav-dd { position: absolute; top: calc(100% + 6px); left: 0; min-width: 200px; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 12px 32px rgba(0,0,0,0.12); z-index: 60; padding: 6px; animation: ddFadeIn 0.15s ease; }
+.cx-nav-dd { position: absolute; top: 100%; left: 0; min-width: 200px; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 12px 32px rgba(0,0,0,0.12); z-index: 60; padding: 6px; padding-top: 12px; margin-top: 0; animation: ddFadeIn 0.15s ease; }
+.cx-nav-dd::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: transparent; }
 @keyframes ddFadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
 .cx-nav-dd-item { display: flex; align-items: center; gap: 10px; width: 100%; background: none; border: none; padding: 10px 12px; border-radius: 8px; font-size: 13px; color: var(--ink-soft); cursor: pointer; text-align: left; transition: all 0.12s; font-family: inherit; }
 .cx-nav-dd-item:hover { background: var(--bg-warm); color: var(--ink); }
@@ -3739,7 +3745,7 @@ function CintexStyles() {
 .cx-btn-ghost { background: var(--paper); color: var(--ink); border-color: var(--line); }
 .cx-btn-ghost:hover { background: var(--bg-warm); border-color: var(--ink-soft); }
 .cx-btn-text { background: none; color: var(--accent-deep); padding: 8px 12px; }
-.cx-btn-text:hover { color: var(--accent); }
+.cx-btn-text:hover { color: var(--accent-text); }
 .cx-btn-lg { padding: 14px 24px; font-size: 15px; border-radius: 12px; }
 .cx-btn-sm { padding: 7px 12px; font-size: 13px; }
 .cx-btn:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -3748,7 +3754,7 @@ function CintexStyles() {
 .cx-hero { padding: 80px 0 60px; }
 .cx-hero-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 60px; align-items: center; }
 .cx-hero h1 { font-family: 'Fraunces', serif; font-size: clamp(36px, 5vw, 60px); font-weight: 500; line-height: 1.05; letter-spacing: -0.025em; margin: 16px 0 20px; }
-.cx-hero h1 em { font-style: italic; color: var(--accent); }
+.cx-hero h1 em { font-style: italic; color: var(--accent-text); }
 .cx-hero-sub { font-size: 17px; color: var(--ink-soft); max-width: 540px; margin: 0 0 28px; }
 .cx-hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 36px; }
 .cx-eyebrow { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; background: var(--accent-tint); color: var(--accent-deep); border-radius: 100px; font-size: 12px; font-weight: 600; letter-spacing: 0.02em; }
@@ -3772,14 +3778,14 @@ function CintexStyles() {
 .cx-section-warm { background: var(--bg-warm); }
 .cx-section-head { text-align: center; max-width: 720px; margin: 0 auto 60px; }
 .cx-section-head h2 { font-family: 'Fraunces', serif; font-size: clamp(30px, 4vw, 44px); font-weight: 500; line-height: 1.1; letter-spacing: -0.02em; margin: 14px 0 16px; }
-.cx-section-head h2 em { font-style: italic; color: var(--accent); }
+.cx-section-head h2 em { font-style: italic; color: var(--accent-text); }
 .cx-section-eyebrow { font-size: 12px; font-weight: 700; color: var(--accent-deep); letter-spacing: 0.1em; text-transform: uppercase; }
 .cx-section-sub { font-size: 16px; color: var(--ink-soft); }
 
 /* Page header */
 .cx-page-header { padding: 60px 0 40px; background: var(--bg-warm); border-bottom: 1px solid var(--line); }
 .cx-page-header h1 { font-family: 'Fraunces', serif; font-size: clamp(32px, 4.5vw, 48px); font-weight: 500; line-height: 1.1; letter-spacing: -0.02em; margin: 0 0 16px; max-width: 800px; }
-.cx-page-header h1 em { font-style: italic; color: var(--accent); }
+.cx-page-header h1 em { font-style: italic; color: var(--accent-text); }
 .cx-page-header p { font-size: 16px; color: var(--ink-soft); max-width: 640px; }
 .cx-breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); margin-bottom: 16px; }
 .cx-breadcrumb button { background: none; border: none; padding: 0; color: var(--accent-deep); cursor: pointer; font-size: 13px; }
@@ -4184,7 +4190,7 @@ function CintexStyles() {
 .cx-heroV2-promo-tag { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: var(--ink); color: var(--bg); border-radius: 100px; font-size: 12px; font-weight: 600; letter-spacing: 0.02em; }
 .cx-heroV2-promo-tag svg { color: var(--accent); }
 .cx-heroV2-title { font-family: 'Fraunces', serif; font-size: clamp(40px, 6vw, 72px); font-weight: 500; line-height: 1.0; letter-spacing: -0.03em; margin: 20px 0 24px; }
-.cx-heroV2-em { font-style: italic; color: var(--accent); position: relative; }
+.cx-heroV2-em { font-style: italic; color: var(--accent-text); position: relative; }
 .cx-heroV2-em::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0.05em; height: 0.18em; background: var(--accent-tint); z-index: -1; }
 .cx-heroV2-sub { font-size: 18px; color: var(--ink-soft); max-width: 540px; margin: 0 0 32px; line-height: 1.5; }
 .cx-heroV2-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 32px; }
